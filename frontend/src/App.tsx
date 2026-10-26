@@ -87,6 +87,7 @@ function HomePage() {
   const [formData, setFormData] = useState<FormState>(initialForm)
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({})
   const [submitted, setSubmitted] = useState(false)
+  const [submissionError, setSubmissionError] = useState('')
 
   useEffect(() => {
     const controller = new AbortController()
@@ -135,8 +136,11 @@ function HomePage() {
     event.preventDefault()
     if (!validateForm()) return
 
+    setSubmitted(false)
+    setSubmissionError('')
+
     try {
-      await fetch(`${API_BASE_URL}/api/requests/`, {
+      const response = await fetch(`${API_BASE_URL}/api/requests/`, {
         method: 'POST',
         headers: buildHeaders(),
         credentials: 'include',
@@ -148,12 +152,15 @@ function HomePage() {
           notes: '',
         }),
       })
+
+      if (!response.ok) throw new Error(`Request rejected with status ${response.status}`)
+
+      setSubmitted(true)
+      setFormData(initialForm)
     } catch (error) {
       console.error('Request send failed', error)
+      setSubmissionError('Не удалось отправить запрос. Проверьте соединение и попробуйте ещё раз.')
     }
-
-    setSubmitted(true)
-    setFormData(initialForm)
   }
 
   return (
@@ -349,7 +356,7 @@ function HomePage() {
             <div>
               <form onSubmit={handleSubmit} noValidate>
                 <div className="proto" role="note">
-                  <b>Прототип:</b> форма ничего не отправляет. Данные остаются в вашем браузере.
+                  <b>Отправьте запрос:</b> он будет сохранён, чтобы менеджер мог его обработать.
                 </div>
 
                 <div className="r2">
@@ -379,14 +386,13 @@ function HomePage() {
                 </label>
 
                 <button className="btn" type="submit">Оставить запрос</button>
+                {submissionError && <p className="err" role="alert">{submissionError}</p>}
               </form>
 
               {submitted && (
                 <div className="ok" style={{ display: 'block' }} role="status">
-                  <b>Запрос принят (демо)</b>
-                  <p>
-                    Это прототип — ничего не отправлено. На рабочем сайте команда связалась бы с вами, {formData.name || 'клиент'}, по телефону.
-                  </p>
+                  <b>Запрос сохранён</b>
+                  <p>Менеджер увидит ваш запрос в панели управления.</p>
                   <button className="btn ghost" type="button" onClick={() => setSubmitted(false)}>
                     Новый запрос
                   </button>
