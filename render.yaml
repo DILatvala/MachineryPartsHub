@@ -8,6 +8,28 @@ services:
     envVars:
       - key: VITE_API_URL
         value: https://mph-backend-9nud.onrender.com
+      - key: VITE_SITE_URL
+        value: https://mph-frontend-qn7j.onrender.com
+      - key: VITE_ADMIN_URL
+        value: https://mph-admin.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  - type: web
+    name: mph-admin
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://mph-backend-9nud.onrender.com
+      - key: VITE_SITE_URL
+        value: https://mph-frontend-qn7j.onrender.com
+      - key: VITE_ADMIN_ONLY
+        value: "true"
     routes:
       - type: rewrite
         source: /*

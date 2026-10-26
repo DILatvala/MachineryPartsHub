@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import (
+    ServiceRequestCsrfView,
     ServiceRequestCreateView,
     ServiceRequestListView,
     ServiceRequestLoginView,
@@ -10,6 +11,7 @@ from .views import (
 )
 
 urlpatterns = [
+    path('requests/csrf/', ServiceRequestCsrfView.as_view(), name='request-csrf'),
     path('requests/', ServiceRequestCreateView.as_view(), name='request-create'),
     path('requests/login/', ServiceRequestLoginView.as_view(), name='request-login'),
     path('requests/logout/', ServiceRequestLogoutView.as_view(), name='request-logout'),

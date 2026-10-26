@@ -29,6 +29,13 @@ class ServiceRequestAPITest(TestCase):
         self.assertEqual(ServiceRequest.objects.count(), 1)
         self.assertEqual(ServiceRequest.objects.get().status, 'new')
 
+    def test_csrf_endpoint_returns_token_and_sets_cookie(self):
+        response = self.client.get(reverse('request-csrf'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['csrfToken'])
+        self.assertIn('csrftoken', response.cookies)
+
     def test_list_requests_returns_all_requests(self):
         self.client.force_login(self.user)
 

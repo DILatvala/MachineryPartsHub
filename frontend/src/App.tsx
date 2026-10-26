@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
-import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 type CatalogItem = {
   id: number
@@ -30,15 +30,23 @@ type FormState = {
 }
 
 const defaultItems: CatalogItem[] = [
-  { id: 1, name: 'Тормозные колодки', category: 1, category_name: 'Тормоза', description: 'Тормозные колодки для легкового автомобиля.', is_active: true },
-  { id: 2, name: 'Масляный фильтр', category: 2, category_name: 'Фильтры', description: 'Масляный фильтр для двигателя.', is_active: true },
-  { id: 3, name: 'Свечи зажигания', category: 3, category_name: 'Двигатель', description: 'Комплект свечей для стабильного зажигания.', is_active: true },
-  { id: 4, name: 'Амортизатор', category: 4, category_name: 'Подвеска', description: 'Передний или задний амортизатор в зависимости от модели.', is_active: true },
-  { id: 5, name: 'Аккумулятор', category: 5, category_name: 'Электрика', description: 'Аккумулятор с достаточной ёмкостью для сезона.', is_active: true },
-  { id: 6, name: 'Диагностика', category: 6, category_name: 'Сервис', description: 'Комплексная диагностика автомобиля.', is_active: true },
+  { id: 1, name: 'Двигатели и комплектующие', category: 1, category_name: 'Двигатели и комплектующие', description: 'Запасные части и комплектующие для двигателей строительной техники.', is_active: true },
+  { id: 2, name: 'Гидронасосы', category: 2, category_name: 'Гидравлика', description: 'Гидронасосы и компоненты гидравлических систем спецтехники.', is_active: true },
+  { id: 3, name: 'Фильтры и ремни', category: 3, category_name: 'Фильтры и ремни', description: 'Фильтрующие элементы и приводные ремни для рабочей техники.', is_active: true },
+  { id: 4, name: 'Турбины и топливные системы', category: 4, category_name: 'Турбины и топливные системы', description: 'Турбокомпрессоры и комплектующие топливных систем.', is_active: true },
+  { id: 5, name: 'Ходовая часть и редукторы', category: 5, category_name: 'Ходовая часть и редукторы', description: 'Компоненты ходовой части, трансмиссии и редукторы.', is_active: true },
+  { id: 6, name: 'Тормозные системы', category: 6, category_name: 'Тормозные системы', description: 'Комплектующие тормозных систем строительной и дорожной техники.', is_active: true },
 ]
 
-const categories = ['Все', 'Двигатель', 'Тормоза', 'Фильтры', 'Подвеска', 'Электрика', 'Сервис']
+const categories = [
+  'Все',
+  'Двигатели и комплектующие',
+  'Гидравлика',
+  'Фильтры и ремни',
+  'Турбины и топливные системы',
+  'Ходовая часть и редукторы',
+  'Тормозные системы',
+]
 
 const initialForm: FormState = {
   name: '',
@@ -48,6 +56,31 @@ const initialForm: FormState = {
 }
 
 const API_BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) || 'http://127.0.0.1:8000'
+const ADMIN_SITE_URL = (import.meta.env.VITE_ADMIN_URL as string | undefined) || '/admin'
+const PUBLIC_SITE_URL = (import.meta.env.VITE_SITE_URL as string | undefined) || '/'
+const ADMIN_ONLY = import.meta.env.VITE_ADMIN_ONLY === 'true'
+let csrfToken = ''
+
+const heroSlides = [
+  {
+    eyebrow: 'Machinery Parts Hub · MPH Group',
+    title: 'Надёжные запчасти',
+    emphasis: 'для спецтехники',
+    description: 'Детали и комплектующие для экскаваторов, бульдозеров, погрузчиков, кранов и строительной техники.',
+  },
+  {
+    eyebrow: 'Оригинальные детали и проверенные аналоги',
+    title: 'Подбор деталей',
+    emphasis: 'под вашу технику',
+    description: 'Помогаем подобрать двигатели, гидравлику, фильтры, ремни, турбины, ходовую часть и тормозные системы.',
+  },
+  {
+    eyebrow: 'Казахстан и страны СНГ',
+    title: 'Поставка без лишних',
+    emphasis: 'задержек',
+    description: 'Оперативная доставка и профессиональная консультация для владельцев техники и сервисных команд.',
+  },
+]
 
 const buildHeaders = (includeCsrf = false) => {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
@@ -58,9 +91,7 @@ const buildHeaders = (includeCsrf = false) => {
       .find((entry) => entry.startsWith('csrftoken='))
       ?.split('=')[1]
 
-    if (csrfCookie) {
-      headers['X-CSRFToken'] = decodeURIComponent(csrfCookie)
-    }
+    headers['X-CSRFToken'] = csrfCookie ? decodeURIComponent(csrfCookie) : csrfToken
   }
 
   return headers
@@ -84,10 +115,22 @@ function HomePage() {
   const [catalog, setCatalog] = useState<CatalogItem[]>(defaultItems)
   const [activeCategory, setActiveCategory] = useState('Все')
   const [searchQuery, setSearchQuery] = useState('')
+  const [activeHeroSlide, setActiveHeroSlide] = useState(0)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [formData, setFormData] = useState<FormState>(initialForm)
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({})
   const [submitted, setSubmitted] = useState(false)
   const [submissionError, setSubmissionError] = useState('')
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const timer = window.setInterval(() => {
+      setActiveHeroSlide((current) => (current + 1) % heroSlides.length)
+    }, 7000)
+
+    return () => window.clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -125,7 +168,7 @@ function HomePage() {
 
     if (formData.name.trim().length < 2) nextErrors.name = 'Введите имя.'
     if (!/^\+?[\d\s()-]{7,}$/.test(formData.phone.trim())) nextErrors.phone = 'Введите корректный номер телефона.'
-    if (formData.vehicle.trim().length < 3) nextErrors.vehicle = 'Укажите марку, модель и год.'
+    if (formData.vehicle.trim().length < 3) nextErrors.vehicle = 'Укажите марку и модель техники.'
     if (formData.part.trim().length < 3) nextErrors.part = 'Укажите нужную запчасть или услугу.'
 
     setErrors(nextErrors)
@@ -168,16 +211,14 @@ function HomePage() {
       <header className="site-header">
         <div className="wrap bar">
           <a className="logo" href="#top" aria-label="MachineryPartsHub — на главную">
-            <i>M</i>
-            <span>
-              MachineryParts<span className="accent">Hub</span>
-            </span>
+            <img className="logo-image" src="/mph-logo.jpg" alt="Machinery Parts Hub" />
+            <span>Запчасти для спецтехники</span>
           </a>
-          <Link to="/admin" className="link-button">Admin</Link>
-          <button className="menu" type="button" aria-expanded="false">
+          <a href={ADMIN_SITE_URL} className="link-button">Менеджер</a>
+          <button className="menu" type="button" aria-expanded={menuOpen} aria-controls="site-navigation" onClick={() => setMenuOpen((open) => !open)}>
             Меню
           </button>
-          <nav aria-label="Основная навигация">
+          <nav id="site-navigation" className={menuOpen ? 'nav-open' : ''} aria-label="Основная навигация" onClick={() => setMenuOpen(false)}>
             <a href="#about">О нас</a>
             <a href="#catalog">Запчасти</a>
             <a href="#request">Запрос</a>
@@ -190,66 +231,75 @@ function HomePage() {
         <section className="hero">
           <div className="wrap hero-grid">
             <div>
-              <span className="eyebrow">Автозапчасти и сервис</span>
-              <h1>
-                Нужная деталь. <em>Установлена правильно.</em>
-              </h1>
-              <p className="lead">
-                Запчасти и сервис для вашего автомобиля. Расскажите, на чём вы ездите и что нужно, — мы поможем проверить наличие.
-              </p>
-              <form className="search" role="search">
+              <div className="hero-carousel" role="group" aria-roledescription="carousel" aria-label="Преимущества Machinery Parts Hub">
+                <div className="hero-slide" aria-live="polite" aria-atomic="true">
+                  <span className="eyebrow">{heroSlides[activeHeroSlide].eyebrow}</span>
+                  <h1>
+                    {heroSlides[activeHeroSlide].title} <em>{heroSlides[activeHeroSlide].emphasis}</em>
+                  </h1>
+                  <p className="lead">{heroSlides[activeHeroSlide].description}</p>
+                </div>
+                <div className="hero-carousel-controls">
+                  <button
+                    type="button"
+                    className="carousel-arrow"
+                    aria-label="Предыдущий слайд"
+                    onClick={() => setActiveHeroSlide((current) => (current - 1 + heroSlides.length) % heroSlides.length)}
+                  >
+                    ←
+                  </button>
+                  <div className="carousel-dots" role="group" aria-label="Выбрать слайд">
+                    {heroSlides.map((slide, index) => (
+                      <button
+                        key={slide.eyebrow}
+                        type="button"
+                        className="carousel-dot"
+                        aria-label={`Слайд ${index + 1}: ${slide.eyebrow}`}
+                        aria-pressed={activeHeroSlide === index}
+                        onClick={() => setActiveHeroSlide(index)}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="carousel-arrow"
+                    aria-label="Следующий слайд"
+                    onClick={() => setActiveHeroSlide((current) => (current + 1) % heroSlides.length)}
+                  >
+                    →
+                  </button>
+                </div>
+              </div>
+              <form
+                className="search"
+                role="search"
+                onSubmit={(event) => {
+                  event.preventDefault()
+                  document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' })
+                }}
+              >
                 <input
                   type="search"
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Поиск запчастей, например: колодки"
+                  placeholder="Например: гидронасос, фильтр"
                   aria-label="Поиск запчастей"
                 />
                 <button type="submit">Найти</button>
               </form>
-              <p className="hint">Нажмите «/», чтобы перейти к поиску. Каталог — демонстрационный.</p>
+              <p className="hint">Подбор запчастей для строительной и дорожно-строительной техники.</p>
             </div>
 
-            <div className="photo-block" role="img" aria-label="Иллюстрация складских стеллажей — заглушка для фото">
-              <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-                <rect width="400" height="300" fill="#1a1a1a" />
-                <rect y="250" width="400" height="50" fill="#262626" />
-                <g fill="#2e2e2e">
-                  <rect x="20" y="40" width="360" height="6" />
-                  <rect x="20" y="115" width="360" height="6" />
-                  <rect x="20" y="190" width="360" height="6" />
-                  <rect x="20" y="40" width="6" height="210" />
-                  <rect x="194" y="40" width="6" height="210" />
-                  <rect x="374" y="40" width="6" height="210" />
-                </g>
-                <g fill="#3a3a3a">
-                  <rect x="36" y="14" width="60" height="26" />
-                  <rect x="104" y="22" width="44" height="18" />
-                  <rect x="210" y="12" width="70" height="28" />
-                  <rect x="40" y="86" width="50" height="29" />
-                  <rect x="100" y="72" width="70" height="43" />
-                  <rect x="220" y="90" width="60" height="25" />
-                  <rect x="290" y="76" width="70" height="39" />
-                  <rect x="36" y="160" width="70" height="30" />
-                  <rect x="214" y="150" width="46" height="40" />
-                  <rect x="270" y="164" width="86" height="26" />
-                </g>
-                <g fill="#FFC400">
-                  <rect x="40" y="94" width="50" height="4" />
-                  <rect x="104" y="80" width="70" height="4" />
-                  <rect x="294" y="84" width="70" height="4" />
-                  <rect x="214" y="158" width="46" height="4" />
-                  <rect x="36" y="168" width="70" height="4" />
-                </g>
-              </svg>
-              <span>Заглушка · замените фото склада</span>
+            <div className="hero-brand-card">
+              <img src="/mph-logo.jpg" alt="Логотип Machinery Parts Hub с изображением спецтехники и запчастей" />
+              <span>Надёжные запчасти для спецтехники</span>
             </div>
           </div>
 
           <div className="wrap strip">
-            <div><b>Запчасти</b>По категориям и автомобилям</div>
-            <div><b>Сервис</b>Обслуживание в мастерской по запросу</div>
-            <div><b>Поддержка</b>Оставьте запрос — проверим наличие</div>
+            <div><b>Оригинал и аналоги</b>Проверенные комплектующие</div>
+            <div><b>Доставка</b>По Казахстану и СНГ</div>
+            <div><b>Подбор</b>Профессиональная консультация</div>
           </div>
         </section>
 
@@ -257,45 +307,28 @@ function HomePage() {
           <div className="wrap about">
             <div>
               <span className="eyebrow">О нас</span>
-              <h2>Запчасти и сервис в одном месте</h2>
+              <h2>Надёжные запчасти для спецтехники</h2>
               <p>
-                MachineryPartsHub — автозапчасти и сервисное обслуживание. [Впишите здесь историю компании, год основания и бренды — только то, что можете подтвердить.]
+                Компания Machinery Parts Hub (MPH Group) — ваш надёжный партнёр в сфере поставок запчастей для спецтехники. Предлагаем комплектующие для экскаваторов, бульдозеров, погрузчиков, кранов и другой строительной и дорожно-строительной техники.
               </p>
               <div className="pillars">
-                <div>Запчасти</div>
-                <div>Сервис</div>
-                <div>Проверка наличия</div>
-                <div>Понятная связь</div>
+                <div>Оригинальные и аналоговые запчасти от ведущих производителей</div>
+                <div>Гарантия качества и долговечности</div>
+                <div>Оперативная доставка по Казахстану и СНГ</div>
+                <div>Профессиональная консультация и подбор деталей</div>
               </div>
             </div>
 
-            <div className="pair">
-              <div className="photo-block" role="img" aria-label="Заглушка: мастерская">
-                <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-                  <rect width="400" height="300" fill="#222" />
-                  <rect y="230" width="400" height="70" fill="#2d2d2d" />
-                  <path d="M60 230 L90 160 H300 L340 230Z" fill="#3b3b3b" />
-                  <circle cx="120" cy="236" r="26" fill="#111" />
-                  <circle cx="290" cy="236" r="26" fill="#111" />
-                  <rect x="0" y="90" width="400" height="5" fill="#FFC400" />
-                  <path d="M30 0v90M370 0v90" stroke="#444" strokeWidth="4" />
-                </svg>
-                <span>Мастерская · заглушка</span>
-              </div>
-              <div className="photo-block" role="img" aria-label="Заглушка: стойка выдачи запчастей">
-                <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-                  <rect width="400" height="300" fill="#e4e4e0" />
-                  <rect y="170" width="400" height="130" fill="#cfcfca" />
-                  <g fill="#9a9a95">
-                    <rect x="40" y="60" width="90" height="110" />
-                    <rect x="150" y="90" width="80" height="80" />
-                    <rect x="250" y="40" width="100" height="130" />
-                  </g>
-                  <rect x="40" y="110" width="90" height="6" fill="#FFC400" />
-                  <rect x="250" y="90" width="100" height="6" fill="#FFC400" />
-                </svg>
-                <span>Выдача запчастей · заглушка</span>
-              </div>
+            <div className="about-assortment">
+              <span className="eyebrow">Ассортимент запчастей</span>
+              <h3>Комплектующие для рабочих машин</h3>
+              <ul>
+                <li>Двигатели и комплектующие</li>
+                <li>Гидравлика и гидронасосы</li>
+                <li>Фильтры, ремни, турбины и топливные системы</li>
+                <li>Ходовая часть, редукторы и тормозные системы</li>
+              </ul>
+              <p>Работаем с владельцами спецтехники, сервисными центрами, строительными и транспортными компаниями.</p>
             </div>
           </div>
         </section>
@@ -341,7 +374,7 @@ function HomePage() {
                 По вашему запросу ничего не найдено. Попробуйте другое слово или отправьте запрос ниже.
               </p>
             )}
-            <p className="note">Демонстрационные позиции — без цен, наличия и характеристик. Замените реальными данными каталога.</p>
+            <p className="note">Указанные цены на сайте не являются публичной офертой.</p>
           </div>
         </section>
 
@@ -350,7 +383,7 @@ function HomePage() {
             <div>
               <span className="eyebrow">Запрос</span>
               <h2>Расскажите, что вам нужно</h2>
-              <p>Укажите данные автомобиля и нужную запчасть или услугу. Поля со звёздочкой * обязательны.</p>
+              <p>Укажите модель спецтехники и нужную запчасть. Поля со звёздочкой * обязательны.</p>
             </div>
 
             <div>
@@ -374,8 +407,8 @@ function HomePage() {
                 </div>
 
                 <label>
-                  Данные автомобиля *
-                  <input name="vehicle" value={formData.vehicle} onChange={(event) => setFormData({ ...formData, vehicle: event.target.value })} aria-invalid={Boolean(errors.vehicle)} placeholder="Марка, модель, год, VIN (по желанию)" />
+                  Данные спецтехники *
+                  <input name="vehicle" value={formData.vehicle} onChange={(event) => setFormData({ ...formData, vehicle: event.target.value })} aria-invalid={Boolean(errors.vehicle)} placeholder="Марка, модель, год, серийный номер" />
                   <span className="err">{errors.vehicle ?? ''}</span>
                 </label>
 
@@ -407,25 +440,23 @@ function HomePage() {
             <div>
               <span className="eyebrow accent-light">Контакты</span>
               <h2>Ищете нужную запчасть?</h2>
-              <p className="lead">Отправьте запрос — наша команда поможет проверить наличие и подобрать подходящее решение.</p>
+              <p className="lead">Свяжитесь с нами для консультации и профессионального подбора запчастей для вашей техники.</p>
               <div className="cta-row">
                 <a className="btn" href="#request">Оставить запрос</a>
-                <a className="btn ghost" href="#contact">WhatsApp</a>
-                <a className="btn ghost" href="#contact">Позвонить</a>
+                <a className="btn ghost" href="https://wa.me/77089693220" target="_blank" rel="noreferrer">WhatsApp</a>
+                <a className="btn ghost" href="tel:+77089693220">Позвонить</a>
               </div>
             </div>
 
             <dl>
               <dt>Телефон</dt>
-              <dd>[Номер телефона]</dd>
-              <dt>WhatsApp</dt>
-              <dd>[Номер WhatsApp]</dd>
-              <dt>Адрес</dt>
-              <dd>[Адрес]</dd>
-              <dt>Часы работы</dt>
-              <dd>[Часы работы]</dd>
+              <dd><a href="tel:+77089693220">+7 708 969 32 20</a></dd>
+              <dt>Доставка</dt>
+              <dd>Казахстан и страны СНГ</dd>
+              <dt>Подбор</dt>
+              <dd>Запчасти для спецтехники</dd>
               <dt>Email</dt>
-              <dd>[Email]</dd>
+              <dd><a href="mailto:MachineryPartsHub@mphgroup.kz">MachineryPartsHub@mphgroup.kz</a></dd>
             </dl>
           </div>
         </section>
@@ -436,12 +467,10 @@ function HomePage() {
           <div className="footer-grid">
             <div>
               <a className="logo" href="#top">
-                <i>M</i>
-                <span>
-                  MachineryParts<span className="accent">Hub</span>
-                </span>
+                <img className="logo-image logo-image-footer" src="/mph-logo.jpg" alt="Machinery Parts Hub" />
+                <span>Machinery Parts Hub · MPH Group</span>
               </a>
-              <p className="footer-copy">Автозапчасти и сервис.</p>
+              <p className="footer-copy">Надёжные запчасти для строительной и дорожно-строительной техники.</p>
             </div>
 
             <div>
@@ -451,6 +480,7 @@ function HomePage() {
                 <li><a href="#catalog">Запчасти</a></li>
                 <li><a href="#request">Запрос</a></li>
                 <li><a href="#contact">Контакты</a></li>
+                <li><a href="https://mphgroup.kz/" target="_blank" rel="noreferrer">MPH Group</a></li>
               </ul>
             </div>
 
@@ -466,22 +496,22 @@ function HomePage() {
             <div>
               <h4>Контакты</h4>
               <ul>
-                <li>[Номер телефона]</li>
-                <li>[Email]</li>
-                <li>[Адрес]</li>
+                <li><a href="tel:+77089693220">+7 708 969 32 20</a></li>
+                <li><a href="mailto:MachineryPartsHub@mphgroup.kz">MachineryPartsHub@mphgroup.kz</a></li>
               </ul>
               <h4 className="social-title">Соцсети</h4>
               <ul className="social-links">
-                <li><a href="#">Instagram</a></li>
-                <li><a href="#">Facebook</a></li>
-                <li><a href="#">YouTube</a></li>
+                <li><a href="https://www.instagram.com/machinerypartshub" target="_blank" rel="noreferrer">Instagram</a></li>
+                <li><a href="https://www.facebook.com/profile.php?id=61569470997783" target="_blank" rel="noreferrer">Facebook</a></li>
+                <li><a href="https://www.youtube.com/@MachineryPartsHub" target="_blank" rel="noreferrer">YouTube</a></li>
               </ul>
             </div>
           </div>
 
           <div className="copy">
-            <span>© {new Date().getFullYear()} MachineryPartsHub. Все права защищены.</span>
-            <span>Дизайн-прототип</span>
+            <span>© {new Date().getFullYear()} Machinery Parts Hub · MPH Group.</span>
+            <a href="https://mphgroup.kz/" target="_blank" rel="noreferrer">Подробнее о MPH Group</a>
+            <span>Указанные цены на сайте не являются публичной офертой.</span>
           </div>
         </div>
       </footer>
@@ -496,6 +526,7 @@ function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false)
   const [username, setUsername] = useState('')
   const [credentials, setCredentials] = useState({ username: '', password: '' })
+  const [loginError, setLoginError] = useState('')
 
   const loadRequests = async () => {
     setLoading(true)
@@ -514,6 +545,11 @@ function AdminPage() {
   const checkSession = async () => {
     setAuthLoading(true)
     try {
+      const csrfResponse = await fetch(`${API_BASE_URL}/api/requests/csrf/`, { credentials: 'include' })
+      if (!csrfResponse.ok) throw new Error('CSRF token request failed')
+      const csrfData = (await csrfResponse.json()) as { csrfToken: string }
+      csrfToken = csrfData.csrfToken
+
       const response = await fetch(`${API_BASE_URL}/api/requests/session/`, { credentials: 'include' })
       if (!response.ok) {
         setAuthenticated(false)
@@ -524,6 +560,10 @@ function AdminPage() {
       const data = (await response.json()) as { authenticated: boolean; username?: string }
       setAuthenticated(Boolean(data.authenticated))
       setUsername(data.username ?? '')
+    } catch {
+      setAuthenticated(false)
+      setUsername('')
+      setLoginError('Не удалось проверить вход. Проверьте соединение и обновите страницу.')
     } finally {
       setAuthLoading(false)
     }
@@ -542,6 +582,7 @@ function AdminPage() {
   const handleLogin = async (event: FormEvent) => {
     event.preventDefault()
     setLoading(true)
+    setLoginError('')
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/requests/login/`, {
@@ -562,6 +603,7 @@ function AdminPage() {
     } catch {
       setAuthenticated(false)
       setUsername('')
+      setLoginError('Не удалось войти. Проверьте имя пользователя и пароль.')
     } finally {
       setLoading(false)
     }
@@ -602,22 +644,25 @@ function AdminPage() {
     return (
       <div className="admin-shell">
         <header className="admin-header">
-          <h1>Manager panel</h1>
-          <Link to="/" className="link-button">На сайт</Link>
+          <div className="admin-brand">
+            <img className="logo-image" src="/mph-logo.jpg" alt="Machinery Parts Hub" />
+            <h1>Панель менеджера</h1>
+          </div>
+          <a href={PUBLIC_SITE_URL} className="link-button">На сайт</a>
         </header>
 
         <section className="admin-table-wrap">
           <form onSubmit={handleLogin} className="admin-login" noValidate>
-            <h2>Вход в менеджерский раздел</h2>
+            <h2>Вход для менеджера</h2>
             <label>
-              Username
+              Имя пользователя
               <input
                 value={credentials.username}
                 onChange={(event) => setCredentials((current) => ({ ...current, username: event.target.value }))}
               />
             </label>
             <label>
-              Password
+              Пароль
               <input
                 type="password"
                 value={credentials.password}
@@ -625,6 +670,7 @@ function AdminPage() {
               />
             </label>
             <button className="btn" type="submit" disabled={loading}>Войти</button>
+            {loginError && <p className="err" role="alert">{loginError}</p>}
           </form>
         </section>
       </div>
@@ -635,12 +681,12 @@ function AdminPage() {
     <div className="admin-shell">
       <header className="admin-header">
         <div>
-          <h1>Manager panel</h1>
+          <h1>Панель менеджера</h1>
           <p className="muted">Вы вошли как {username}</p>
         </div>
         <div className="admin-actions">
           <button type="button" className="link-button" onClick={handleLogout}>Выйти</button>
-          <Link to="/" className="link-button">На сайт</Link>
+          <a href={PUBLIC_SITE_URL} className="link-button">На сайт</a>
         </div>
       </header>
 
@@ -655,7 +701,7 @@ function AdminPage() {
               <tr>
                 <th>Клиент</th>
                 <th>Телефон</th>
-                <th>Авто</th>
+                <th>Техника</th>
                 <th>Запрос</th>
                 <th>Статус</th>
               </tr>
@@ -693,8 +739,17 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/admin" element={<AdminPage />} />
+        {ADMIN_ONLY ? (
+          <Route path="*" element={<AdminPage />} />
+        ) : (
+          <>
+            <Route path="/" element={<HomePage />} />
+            <Route
+              path="/admin"
+              element={ADMIN_SITE_URL.startsWith('http') ? <Navigate to={ADMIN_SITE_URL} replace /> : <AdminPage />}
+            />
+          </>
+        )}
       </Routes>
     </BrowserRouter>
   )

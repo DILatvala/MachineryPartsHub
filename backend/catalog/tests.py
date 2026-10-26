@@ -1,3 +1,4 @@
+from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
@@ -33,3 +34,32 @@ class CatalogAPITest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()[0]['name'], 'Brakes')
+
+
+class SeedCatalogCommandTest(TestCase):
+    def test_seed_replaces_legacy_demo_parts_without_deactivating_custom_parts(self):
+        legacy_category = Category.objects.create(name='Тормоза')
+        legacy_part = Part.objects.create(
+            category=legacy_category,
+            name='Тормозные колодки',
+            description='Legacy demo part.',
+        )
+        custom_part = Part.objects.create(
+            category=legacy_category,
+            name='Custom manager part',
+            description='Manager-maintained part.',
+        )
+
+        call_command('seed_catalog')
+
+        legacy_part.refresh_from_db()
+        custom_part.refresh_from_db()
+        self.assertFalse(legacy_part.is_active)
+        self.assertTrue(custom_part.is_active)
+        self.assertTrue(
+            Part.objects.filter(
+                category__name='Гидравлика',
+                name='Гидронасосы',
+                is_active=True,
+            ).exists()
+        )

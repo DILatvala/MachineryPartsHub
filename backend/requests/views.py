@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.core.cache import cache
+from django.middleware.csrf import get_token
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -8,6 +9,11 @@ from rest_framework.views import APIView
 
 from .models import ServiceRequest
 from .serializers import ServiceRequestSerializer
+
+
+class ServiceRequestCsrfView(APIView):
+    def get(self, request):
+        return Response({'csrfToken': get_token(request)})
 
 
 class ServiceRequestCreateView(APIView):

@@ -1,12 +1,12 @@
-# MachineryPartsHub
+# Machinery Parts Hub
 
-MachineryPartsHub is a fullstack automotive spare parts and service website prototype.
+Machinery Parts Hub (MPH Group) supplies original and alternative spare parts for excavators, bulldozers, loaders, cranes, and other construction and road machinery.
 
 ## Overview
 This project includes:
-- public storefront and catalog browsing
-- service request form with client-side validation
-- manager/admin view for request tracking and status changes
+- public storefront and heavy-equipment parts catalog
+- validated spare-parts request form
+- a separate manager site for request tracking and status changes
 - deployable React + Django setup for local and containerized development
 
 ## Docs
@@ -66,15 +66,18 @@ This starts:
 
 ### Live demo
 - Frontend: https://mph-frontend-qn7j.onrender.com
+- Manager panel: configured as a separate Render static site in the Blueprint
 - Backend API: https://mph-backend-9nud.onrender.com
 
 ### Deploying on Render
-1. Push the repository to GitHub and create a Render Blueprint from the included [render.yaml](./render.yaml).
-2. Set the prompted `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, `MANAGER_USERNAME`, and `MANAGER_PASSWORD` values. Use the exact frontend URL for both origin settings, without a trailing slash.
-3. The Blueprint deploys the React frontend as a free static site and the Django API as a free web service, backed by free PostgreSQL. The frontend build gets `VITE_API_URL` from the Blueprint.
-4. If Render assigns a different hostname to either service, update `ALLOWED_HOSTS`, `VITE_API_URL`, and the origin settings to match the actual URLs, then redeploy.
+1. Push the repository to GitHub and sync the Render Blueprint in [render.yaml](./render.yaml).
+2. Set `CORS_ALLOWED_ORIGINS` and `CSRF_TRUSTED_ORIGINS` to both the storefront and manager-site origins, separated by commas and without trailing slashes. Set `MANAGER_USERNAME` and `MANAGER_PASSWORD` as private environment values.
+3. The Blueprint deploys the storefront and a separate manager-panel static site, plus the Django API and free PostgreSQL database. Both frontend builds get their API URL from the Blueprint.
+4. Render assigns a URL to the manager site when it is created. Put that exact URL in the storefront's `VITE_ADMIN_URL`, and add both site URLs to the backend's CORS and CSRF trusted-origin settings, then redeploy.
 
 The demo database on Render's free plan expires after 30 days, and the free backend can spin down while idle. This setup is intended for demonstration, not durable production data.
+
+The published company phone, email, and social links are listed in the storefront. The catalog starts with sample heavy-equipment categories and can be maintained in Django admin.
 
 ## Current status
 The storefront and manager flow are implemented and validated. The project is now positioned as an MVP-ready prototype with deployment and environment configuration in place.
