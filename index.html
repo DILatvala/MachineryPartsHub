@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MachineryPartsHub</title>
+    <meta
+      name="description"
+      content="MachineryPartsHub — автозапчасти и сервис. Каталог, форма запроса и контакты."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap bar">
+        <a class="logo" href="#top" aria-label="MachineryPartsHub — на главную">
+          <i>M</i>
+          <span>MachineryParts<span class="accent">Hub</span></span>
+        </a>
+        <button class="menu" id="menu" aria-expanded="false" aria-controls="nav">
+          Меню
+        </button>
+        <nav id="nav" aria-label="Основная навигация">
+          <a href="#about">О нас</a>
+          <a href="#catalog">Запчасти</a>
+          <a href="#request">Запрос</a>
+          <a href="#contact">Контакты</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="wrap hero-grid">
+          <div>
+            <span class="eyebrow">Автозапчасти и сервис</span>
+            <h1>Нужная деталь. <em>Установлена правильно.</em></h1>
+            <p class="lead">
+              Запчасти и сервис для вашего автомобиля. Расскажите, на чём вы ездите и
+              что нужно, — мы поможем проверить наличие.
+            </p>
+            <form class="search" id="hsearch" role="search">
+              <input
+                id="q"
+                type="search"
+                placeholder="Поиск запчастей, например: колодки"
+                aria-label="Поиск запчастей"
+              />
+              <button type="submit">Найти</button>
+            </form>
+            <p class="hint">Нажмите «/», чтобы перейти к поиску. Каталог — демонстрационный.</p>
+          </div>
+
+          <div class="photo-block" role="img" aria-label="Иллюстрация складских стеллажей — заглушка для фото">
+            <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <rect width="400" height="300" fill="#1a1a1a"/>
+              <rect y="250" width="400" height="50" fill="#262626"/>
+              <g fill="#2e2e2e">
+                <rect x="20" y="40" width="360" height="6"/>
+                <rect x="20" y="115" width="360" height="6"/>
+                <rect x="20" y="190" width="360" height="6"/>
+                <rect x="20" y="40" width="6" height="210"/>
+                <rect x="194" y="40" width="6" height="210"/>
+                <rect x="374" y="40" width="6" height="210"/>
+              </g>
+              <g fill="#3a3a3a">
+                <rect x="36" y="14" width="60" height="26"/>
+                <rect x="104" y="22" width="44" height="18"/>
+                <rect x="210" y="12" width="70" height="28"/>
+                <rect x="40" y="86" width="50" height="29"/>
+                <rect x="100" y="72" width="70" height="43"/>
+                <rect x="220" y="90" width="60" height="25"/>
+                <rect x="290" y="76" width="70" height="39"/>
+                <rect x="36" y="160" width="70" height="30"/>
+                <rect x="214" y="150" width="46" height="40"/>
+                <rect x="270" y="164" width="86" height="26"/>
+              </g>
+              <g fill="#FFC400">
+                <rect x="40" y="94" width="50" height="4"/>
+                <rect x="104" y="80" width="70" height="4"/>
+                <rect x="294" y="84" width="70" height="4"/>
+                <rect x="214" y="158" width="46" height="4"/>
+                <rect x="36" y="168" width="70" height="4"/>
+              </g>
+            </svg>
+            <span>Заглушка · замените фото склада</span>
+          </div>
+        </div>
+
+        <div class="wrap strip">
+          <div><b>Запчасти</b>По категориям и автомобилям</div>
+          <div><b>Сервис</b>Обслуживание в мастерской по запросу</div>
+          <div><b>Поддержка</b>Оставьте запрос — проверим наличие</div>
+        </div>
+      </section>
+
+      <section id="about">
+        <div class="wrap about">
+          <div>
+            <span class="eyebrow">О нас</span>
+            <h2>Запчасти и сервис в одном месте</h2>
+            <p>
+              MachineryPartsHub — автозапчасти и сервисное обслуживание. [Впишите здесь
+              историю компании, год основания и бренды — только то, что можете подтвердить.]
+            </p>
+            <div class="pillars">
+              <div>Запчасти</div>
+              <div>Сервис</div>
+              <div>Проверка наличия</div>
+              <div>Понятная связь</div>
+            </div>
+          </div>
+
+          <div class="pair">
+            <div class="photo-block workshop" role="img" aria-label="Заглушка: мастерская">
+              <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <rect width="400" height="300" fill="#222"/>
+                <rect y="230" width="400" height="70" fill="#2d2d2d"/>
+                <path d="M60 230 L90 160 H300 L340 230Z" fill="#3b3b3b"/>
+                <circle cx="120" cy="236" r="26" fill="#111"/>
+                <circle cx="290" cy="236" r="26" fill="#111"/>
+                <rect x="0" y="90" width="400" height="5" fill="#FFC400"/>
+                <path d="M30 0v90M370 0v90" stroke="#444" stroke-width="4"/>
+              </svg>
+              <span>Мастерская · заглушка</span>
+            </div>
+
+            <div class="photo-block shelf" role="img" aria-label="Заглушка: стойка выдачи запчастей">
+              <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <rect width="400" height="300" fill="#e4e4e0"/>
+                <rect y="170" width="400" height="130" fill="#cfcfca"/>
+                <g fill="#9a9a95">
+                  <rect x="40" y="60" width="90" height="110"/>
+                  <rect x="150" y="90" width="80" height="80"/>
+                  <rect x="250" y="40" width="100" height="130"/>
+                </g>
+                <rect x="40" y="110" width="90" height="6" fill="#FFC400"/>
+                <rect x="250" y="90" width="100" height="6" fill="#FFC400"/>
+              </svg>
+              <span>Выдача запчастей · заглушка</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="catalog" class="alt">
+        <div class="wrap">
+          <div class="head">
+            <div>
+              <span class="eyebrow">Запчасти и сервис</span>
+              <h2>Каталог по категориям</h2>
+            </div>
+            <div class="chips" role="group" aria-label="Фильтр по категории" id="chips"></div>
+          </div>
+
+          <div class="cards" id="cards" aria-live="polite"></div>
+          <p class="empty" id="empty">
+            По вашему запросу ничего не найдено. Попробуйте другое слово или отправьте запрос ниже.
+          </p>
+          <p class="note">Демонстрационные позиции — без цен, наличия и характеристик. Замените реальными данными каталога.</p>
+        </div>
+      </section>
+
+      <section id="request">
+        <div class="wrap formgrid">
+          <div>
+            <span class="eyebrow">Запрос</span>
+            <h2>Расскажите, что вам нужно</h2>
+            <p>
+              Укажите данные автомобиля и нужную запчасть или услугу. Поля со звёздочкой * обязательны.
+            </p>
+          </div>
+
+          <div>
+            <form id="rf" novalidate>
+              <div class="proto" role="note">
+                <b>Прототип:</b> форма ничего не отправляет. Данные остаются в вашем браузере.
+              </div>
+
+              <div class="r2">
+                <label>
+                  Имя *
+                  <input name="name" autocomplete="name" />
+                  <span class="err"></span>
+                </label>
+
+                <label>
+                  Телефон *
+                  <input name="phone" type="tel" autocomplete="tel" placeholder="+7" />
+                  <span class="err"></span>
+                </label>
+              </div>
+
+              <label>
+                Данные автомобиля *
+                <input name="vehicle" placeholder="Марка, модель, год, VIN (по желанию)" />
+                <span class="err"></span>
+              </label>
+
+              <label>
+                Запчасть или услуга *
+                <textarea name="part" rows="4" placeholder="Что вы ищете?"></textarea>
+                <span class="err"></span>
+              </label>
+
+              <button class="btn" type="submit">Оставить запрос</button>
+            </form>
+
+            <div class="ok" id="ok" role="status">
+              <b>Запрос принят (демо)</b>
+              <p>
+                Это прототип — ничего не отправлено. На рабочем сайте команда связалась бы с вами,
+                <span id="okname"></span>, по телефону.
+              </p>
+              <button class="btn ghost" id="again" type="button">Новый запрос</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact" id="contact">
+        <div class="wrap grid">
+          <div>
+            <span class="eyebrow accent-light">Контакты</span>
+            <h2>Ищете нужную запчасть?</h2>
+            <p class="lead">
+              Отправьте запрос — наша команда поможет проверить наличие и подобрать подходящее решение.
+            </p>
+            <div class="cta-row">
+              <a class="btn" href="#request">Оставить запрос</a>
+              <a class="btn ghost" data-link="wa" href="#contact">WhatsApp</a>
+              <a class="btn ghost" data-link="tel" href="#contact">Позвонить</a>
+            </div>
+          </div>
+
+          <dl>
+            <dt>Телефон</dt>
+            <dd data-f="phone">[Номер телефона]</dd>
+            <dt>WhatsApp</dt>
+            <dd data-f="wa">[Номер WhatsApp]</dd>
+            <dt>Адрес</dt>
+            <dd data-f="addr">[Адрес]</dd>
+            <dt>Часы работы</dt>
+            <dd data-f="hours">[Часы работы]</dd>
+            <dt>Email</dt>
+            <dd data-f="email">[Email]</dd>
+          </dl>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <div class="footer-grid">
+          <div>
+            <a class="logo" href="#top">
+              <i>M</i>
+              <span>MachineryParts<span class="accent">Hub</span></span>
+            </a>
+            <p class="footer-copy">Автозапчасти и сервис.</p>
+          </div>
+
+          <div>
+            <h4>Навигация</h4>
+            <ul>
+              <li><a href="#about">О нас</a></li>
+              <li><a href="#catalog">Запчасти</a></li>
+              <li><a href="#request">Запрос</a></li>
+              <li><a href="#contact">Контакты</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4>Категории</h4>
+            <ul id="fcats"></ul>
+          </div>
+
+          <div>
+            <h4>Контакты</h4>
+            <ul>
+              <li data-f="phone">[Номер телефона]</li>
+              <li data-f="email">[Email]</li>
+              <li data-f="addr">[Адрес]</li>
+            </ul>
+            <h4 class="social-title">Соцсети</h4>
+            <ul class="social-links">
+              <li><a href="#">Instagram</a></li>
+              <li><a href="#">Facebook</a></li>
+              <li><a href="#">YouTube</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="copy">
+          <span>© <span id="yr"></span> MachineryPartsHub. Все права защищены.</span>
+          <span>Дизайн-прототип</span>
+        </div>
+      </div>
+    </footer>
+
+    <div class="etool">
+      <span class="msg">Режим редактирования: кликайте по любому тексту. Правки сохраняются в этом браузере.</span>
+      <button id="rst" hidden type="button">Сбросить правки</button>
+      <button id="edit" aria-pressed="false" type="button">✎ Редактировать текст</button>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: machinerypartshub
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d machinerypartshub"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    environment:
+      DEBUG: "True"
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in the root .env file}
+      ALLOWED_HOSTS: localhost,127.0.0.1,backend
+      DATABASE_URL: postgres://postgres:postgres@db:5432/machinerypartshub
+      MANAGER_USERNAME: ${MANAGER_USERNAME:?Set MANAGER_USERNAME in the root .env file}
+      MANAGER_PASSWORD: ${MANAGER_PASSWORD:?Set MANAGER_PASSWORD in the root .env file}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "python manage.py migrate && python manage.py seed_manager && python manage.py seed_catalog && python manage.py seed_requests && python manage.py runserver 0.0.0.0:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:8000
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+
+volumes:
+  pgdata:
