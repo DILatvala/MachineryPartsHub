@@ -1,5 +1,19 @@
 services:
   - type: web
+    name: mph-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://mph-backend-9nud.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  - type: web
     name: mph-backend
     runtime: python
     plan: free

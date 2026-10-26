@@ -64,18 +64,13 @@ This starts:
 
 ## Production deployment
 
-### Backend on Render
-1. Push the repository to GitHub.
-2. Create a new Render web service pointing to this repository.
-3. Use the included [render.yaml](./render.yaml) blueprint or set the service root to `backend`.
-4. Set the prompted `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, `MANAGER_USERNAME`, and `MANAGER_PASSWORD` values. Set `ALLOWED_HOSTS` to the exact Render service hostname if its name differs from `mph-backend.onrender.com`.
-5. Deploy the service. Its pre-deploy command applies migrations, and startup creates/updates the staff manager from configured credentials before starting Gunicorn.
+### Deploying on Render
+1. Push the repository to GitHub and create a Render Blueprint from the included [render.yaml](./render.yaml).
+2. Set the prompted `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, `MANAGER_USERNAME`, and `MANAGER_PASSWORD` values. Use the exact frontend URL for both origin settings, without a trailing slash.
+3. The Blueprint deploys the React frontend as a free static site and the Django API as a free web service, backed by free PostgreSQL. The frontend build gets `VITE_API_URL` from the Blueprint.
+4. If Render assigns a different hostname to either service, update `ALLOWED_HOSTS`, `VITE_API_URL`, and the origin settings to match the actual URLs, then redeploy.
 
-### Frontend on Cloudflare Pages
-1. Import the `frontend/` folder into Cloudflare Pages.
-2. Set the build command to `npm install && npm run build`.
-3. Set the build output directory to `dist`.
-4. Add `VITE_API_URL` pointing to the deployed Render backend URL, using the example in [frontend/.env.production.example](./frontend/.env.production.example).
+The demo database on Render's free plan expires after 30 days, and the free backend can spin down while idle. This setup is intended for demonstration, not durable production data.
 
 ## Current status
 The storefront and manager flow are implemented and validated. The project is now positioned as an MVP-ready prototype with deployment and environment configuration in place.
