@@ -39,9 +39,9 @@
 - [x] Add tests: backend API, frontend form behavior
 - [x] Add rate limiting and spam protection
 - [x] Configure env-based deployment settings
-- [ ] Deploy frontend to Cloudflare Pages
-- [ ] Deploy backend to Render
-- [ ] Validate database connectivity and production config
+- [x] Deploy frontend to Render Static Site
+- [x] Deploy backend to Render
+- [x] Validate database connectivity and production config
 
 ## Sprint 6: Hardening
 - [ ] Add media storage with Cloudflare R2/S3
@@ -58,5 +58,4 @@
 - [x] Core functional tests pass
 
 ## Next up
-- Deploy the app to hosted infrastructure
 - Improve hardening, SEO metadata, and media storage

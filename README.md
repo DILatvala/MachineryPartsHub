@@ -64,6 +64,10 @@ This starts:
 
 ## Production deployment
 
+### Live demo
+- Frontend: https://mph-frontend-qn7j.onrender.com
+- Backend API: https://mph-backend-9nud.onrender.com
+
 ### Deploying on Render
 1. Push the repository to GitHub and create a Render Blueprint from the included [render.yaml](./render.yaml).
 2. Set the prompted `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, `MANAGER_USERNAME`, and `MANAGER_PASSWORD` values. Use the exact frontend URL for both origin settings, without a trailing slash.
