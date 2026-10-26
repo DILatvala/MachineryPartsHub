@@ -521,7 +521,7 @@ function HomePage() {
 
 function AdminPage() {
   const [requests, setRequests] = useState<ServiceRequest[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [authLoading, setAuthLoading] = useState(true)
   const [authenticated, setAuthenticated] = useState(false)
   const [username, setUsername] = useState('')

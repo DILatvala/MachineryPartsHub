@@ -66,7 +66,7 @@ This starts:
 
 ### Live demo
 - Frontend: https://mph-frontend-qn7j.onrender.com
-- Manager panel: configured as a separate Render static site in the Blueprint
+- Manager panel: https://mph-admin.onrender.com
 - Backend API: https://mph-backend-9nud.onrender.com
 
 ### Deploying on Render
