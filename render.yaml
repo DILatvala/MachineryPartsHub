@@ -2,10 +2,10 @@ services:
   - type: web
     name: mph-backend
     runtime: python
+    plan: free
     rootDir: backend
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
-    preDeployCommand: python manage.py migrate
-    startCommand: python manage.py seed_manager && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    startCommand: python manage.py migrate && python manage.py seed_manager && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: DEBUG
         value: "False"
@@ -28,5 +28,6 @@ services:
 
 databases:
   - name: mph-postgres
+    plan: free
     databaseName: machinerypartshub
     user: mphuser
