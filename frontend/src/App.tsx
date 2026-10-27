@@ -578,7 +578,14 @@ function AdminPage() {
   const [catalogError, setCatalogError] = useState('')
   const [catalogSuccess, setCatalogSuccess] = useState('')
   const [editingPartId, setEditingPartId] = useState<number | null>(null)
-  const [partForm, setPartForm] = useState({ name: '', description: '', category: '', brand: '', equipment_model: '' })
+  const [partForm, setPartForm] = useState({
+    name: '',
+    description: '',
+    category: '',
+    brand: '',
+    equipment_model: '',
+    is_active: true,
+  })
   const [partImage, setPartImage] = useState<File | null>(null)
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     typeof Notification !== 'undefined' && Notification.permission === 'granted',
@@ -778,7 +785,7 @@ function AdminPage() {
 
   const resetPartForm = () => {
     setEditingPartId(null)
-    setPartForm({ name: '', description: '', category: '', brand: '', equipment_model: '' })
+    setPartForm({ name: '', description: '', category: '', brand: '', equipment_model: '', is_active: true })
     setPartImage(null)
     setCatalogError('')
     setCatalogSuccess('')
@@ -793,6 +800,7 @@ function AdminPage() {
       category: String(part.category),
       brand: part.brand ?? '',
       equipment_model: part.equipment_model ?? '',
+      is_active: part.is_active,
     })
     setCatalogSuccess('')
     setCatalogError('')
@@ -802,7 +810,7 @@ function AdminPage() {
     event.preventDefault()
     setCatalogError('')
     setCatalogSuccess('')
-    const payload = { ...partForm, category: Number(partForm.category), is_active: true }
+    const payload = { ...partForm, category: Number(partForm.category) }
     const url = editingPartId
       ? `${API_BASE_URL}/api/catalog/manage/${editingPartId}/`
       : `${API_BASE_URL}/api/catalog/manage/`
@@ -853,6 +861,23 @@ function AdminPage() {
     } catch (error) {
       console.error('Catalog archive failed', error)
       setCatalogError(t('Не удалось скрыть позицию. Попробуйте ещё раз.'))
+    }
+  }
+
+  const restorePart = async (part: CatalogItem) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/catalog/manage/${part.id}/`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: buildHeaders(true),
+        body: JSON.stringify({ is_active: true }),
+      })
+      if (!response.ok) throw new Error(`Catalog restore failed (${response.status})`)
+      if (!await loadCatalog()) return
+      setCatalogSuccess(t('Позиция восстановлена в каталоге.'))
+    } catch (error) {
+      console.error('Catalog restore failed', error)
+      setCatalogError(t('Не удалось восстановить позицию. Попробуйте ещё раз.'))
     }
   }
 
@@ -1081,6 +1106,7 @@ function AdminPage() {
                     <div className="admin-part-actions">
                       <button type="button" className="link-button" onClick={() => editPart(part)}>{t('Изменить')}</button>
                       {part.is_active && <button type="button" className="link-button danger-button" onClick={() => void archivePart(part)}>{t('Скрыть')}</button>}
+                      {!part.is_active && <button type="button" className="link-button restore-button" onClick={() => void restorePart(part)}>{t('Восстановить')}</button>}
                     </div>
                   </article>
                 ))}

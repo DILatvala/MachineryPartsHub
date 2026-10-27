@@ -187,6 +187,19 @@ class CatalogManagementAPITest(TestCase):
         self.part.refresh_from_db()
         self.assertFalse(self.part.is_active)
 
+        response = self.client.patch(
+            reverse('catalog-manage-detail', args=[self.part.pk]),
+            {'is_active': True},
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.part.refresh_from_db()
+        self.assertTrue(self.part.is_active)
+        self.assertEqual(
+            [part['id'] for part in self.client.get(reverse('part-list')).json()],
+            [self.part.pk],
+        )
+
 
 class SeedCatalogCommandTest(TestCase):
     def test_seed_replaces_legacy_demo_parts_without_deactivating_custom_parts(self):

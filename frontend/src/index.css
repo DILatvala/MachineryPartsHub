@@ -1018,6 +1018,11 @@ footer a {
   color: #7d1717;
 }
 
+.restore-button {
+  background: #e4f2e8;
+  color: #17653a;
+}
+
 .admin-brand {
   display: flex;
   align-items: center;

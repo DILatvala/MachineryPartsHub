@@ -82,7 +82,7 @@ This starts:
 
 The demo database on Render's free plan expires after 30 days, and the free backend can spin down while idle. This setup is intended for demonstration, not durable production data.
 
-The published company phone, email, and social links are listed in the storefront. The catalog starts with sample heavy-equipment categories and can be maintained in the manager panel or Django admin. Manager notifications poll for new requests every 30 seconds and work only while the manager panel is open; browser notifications are optional and require browser permission. No paid notification service is used.
+The published company phone, email, and social links are listed in the storefront. The catalog starts with sample heavy-equipment categories and can be maintained in the manager panel or Django admin. Archived catalog items remain available in the manager inventory and can be explicitly restored. Manager notifications poll for new requests every 30 seconds and work only while the manager panel is open; browser notifications are optional and require browser permission. No paid notification service is used.
 
 ### Optional catalog image storage
 Catalog images are limited to 5 MB and validated as image files. Local development stores them in `backend/media/`. Production uploads are deliberately disabled until durable object storage is configured, because Render's local filesystem is ephemeral.
