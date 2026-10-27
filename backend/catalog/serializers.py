@@ -14,7 +14,16 @@ class PartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Part
-        fields = ['id', 'name', 'description', 'category', 'category_name', 'is_active']
+        fields = [
+            'id',
+            'name',
+            'description',
+            'category',
+            'category_name',
+            'brand',
+            'equipment_model',
+            'is_active',
+        ]
 
     def get_category_name(self, obj):
         return obj.category.name

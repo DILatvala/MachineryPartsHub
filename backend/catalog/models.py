@@ -16,12 +16,17 @@ class Part(models.Model):
     category = models.ForeignKey(Category, related_name='parts', on_delete=models.PROTECT)
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True, default='')
+    brand = models.CharField(max_length=120, blank=True, default='')
+    equipment_model = models.CharField(max_length=160, blank=True, default='')
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['name']
+        indexes = [
+            models.Index(fields=['brand', 'equipment_model']),
+        ]
 
     def __str__(self):
         return self.name

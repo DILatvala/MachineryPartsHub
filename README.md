@@ -5,8 +5,12 @@ Machinery Parts Hub (MPH Group) supplies original and alternative spare parts fo
 ## Overview
 This project includes:
 - public storefront and heavy-equipment parts catalog
+- catalog search by part name, category, brand, and equipment model
 - validated spare-parts request form
-- a separate manager site for request tracking and status changes
+- a separate manager site for request tracking, status changes, and catalog editing
+- Russian, Kazakh, and English storefront and manager interfaces
+- opt-in in-browser manager notifications for new requests
+- storefront search metadata, social sharing cards, structured organization data, and a sitemap
 - deployable React + Django setup for local and containerized development
 
 ## Docs
@@ -77,7 +81,7 @@ This starts:
 
 The demo database on Render's free plan expires after 30 days, and the free backend can spin down while idle. This setup is intended for demonstration, not durable production data.
 
-The published company phone, email, and social links are listed in the storefront. The catalog starts with sample heavy-equipment categories and can be maintained in Django admin.
+The published company phone, email, and social links are listed in the storefront. The catalog starts with sample heavy-equipment categories and can be maintained in the manager panel or Django admin. Manager notifications poll for new requests every 30 seconds and work only while the manager panel is open; browser notifications are optional and require browser permission. No paid notification service is used.
 
 ## Current status
 The storefront and manager flow are implemented and validated. The project is now positioned as an MVP-ready prototype with deployment and environment configuration in place.

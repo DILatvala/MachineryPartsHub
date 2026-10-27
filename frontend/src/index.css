@@ -176,6 +176,35 @@ section {
   height: 76px;
 }
 
+.language-picker {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  margin-left: auto;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.language-picker select {
+  width: auto;
+  min-width: 62px;
+  padding: 7px 8px;
+  border: 1px solid #676760;
+  background: #171717;
+  color: #fff;
+  font-weight: 700;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
 .accent {
   color: var(--y);
 }
@@ -565,6 +594,12 @@ nav a:hover {
   font-size: 0.9rem;
 }
 
+.card .part-fit {
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 .card button {
   margin-top: auto;
   border: 0;
@@ -832,6 +867,144 @@ footer a {
   margin-bottom: 24px;
 }
 
+.admin-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid var(--line);
+}
+
+.admin-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--mut);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-tabs button[aria-selected='true'] {
+  border-bottom-color: var(--y);
+  color: var(--ink);
+}
+
+.notification-count {
+  min-width: 22px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--y);
+  color: var(--ink);
+  font-size: 0.76rem;
+  text-align: center;
+}
+
+.incoming-request-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 14px 18px;
+  border-left: 4px solid var(--y);
+  background: #fff8dc;
+}
+
+.incoming-request-banner button {
+  padding: 7px 12px;
+  border: 1px solid var(--ink);
+  background: transparent;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-error {
+  margin: 12px 0;
+}
+
+.catalog-manager {
+  display: grid;
+  gap: 34px;
+}
+
+.catalog-manager h2 {
+  margin-bottom: 16px;
+  font-size: clamp(1.3rem, 3vw, 2rem);
+}
+
+.catalog-editor {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.catalog-description,
+.catalog-editor-actions {
+  grid-column: 1 / -1;
+}
+
+.catalog-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.catalog-success {
+  margin-bottom: 12px;
+  color: #17653a;
+}
+
+.admin-part-list {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-part {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.admin-part > div:first-child {
+  display: grid;
+  gap: 5px;
+}
+
+.admin-part span,
+.admin-part p,
+.admin-part small {
+  color: var(--mut);
+}
+
+.admin-part-archived {
+  opacity: 0.65;
+}
+
+.admin-part-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.danger-button {
+  background: #f3dddd;
+  color: #7d1717;
+}
+
 .admin-brand {
   display: flex;
   align-items: center;
@@ -902,6 +1075,14 @@ footer a {
 @media (max-width: 860px) {
   .menu {
     display: block;
+  }
+
+  .language-picker {
+    margin-left: auto;
+  }
+
+  .menu + nav {
+    order: 4;
   }
 
   nav {
@@ -977,6 +1158,30 @@ footer a {
   }
 
   .admin-header {
+    flex-direction: column;
+  }
+
+  .admin-actions {
+    justify-content: flex-start;
+  }
+
+  .catalog-editor {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .catalog-description,
+  .catalog-editor-actions {
+    grid-column: auto;
+  }
+
+  .admin-part {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .incoming-request-banner {
+    align-items: flex-start;
     flex-direction: column;
   }
 
