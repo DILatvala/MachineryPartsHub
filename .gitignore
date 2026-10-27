@@ -18,6 +18,7 @@ dist/
 
 # Collected static files
 backend/staticfiles/
+backend/media/
 
 # Local/editor files
 .DS_Store

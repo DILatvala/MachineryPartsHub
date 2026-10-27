@@ -574,6 +574,12 @@ nav a:hover {
   color: var(--ink);
 }
 
+.card .photo-block img {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+}
+
 .card .body {
   padding: 16px;
   display: flex;
@@ -982,6 +988,13 @@ footer a {
 .admin-part > div:first-child {
   display: grid;
   gap: 5px;
+}
+
+.admin-part-image {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border: 1px solid var(--line);
 }
 
 .admin-part span,

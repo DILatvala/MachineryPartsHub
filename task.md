@@ -44,10 +44,10 @@
 - [x] Validate database connectivity and production config
 
 ## Sprint 6: Hardening
-- [ ] Add media storage with Cloudflare R2/S3
+- [x] Add optional S3-compatible media storage with safe local development fallback
 - [x] Add no-cost in-browser manager notifications for new requests
 - [x] Improve SEO and metadata, social cards, structured data, robots, and sitemap
-- [ ] Add analytics and contact form tracking if needed
+- [x] Keep analytics disabled unless explicitly needed; do not collect visitor data by default
 - [x] Final security review and cleanup
 
 ## Sprint 7: Catalog and usability improvements
@@ -63,4 +63,4 @@
 - [x] Core functional tests pass
 
 ## Next up
-- Consider media storage and optional analytics if those capabilities are needed
+- Configure an R2-compatible bucket and private credentials before enabling production image uploads

@@ -41,6 +41,7 @@ type CatalogItem = {
   description: string
   brand?: string
   equipment_model?: string
+  image?: string | null
   is_active: boolean
 }
 
@@ -391,7 +392,9 @@ function HomePage() {
             <div className="cards" aria-live="polite">
               {filteredItems.map((item) => (
                 <article key={item.id} className="card">
-                  <div className="photo-block" dangerouslySetInnerHTML={{ __html: ICON }} />
+                  {item.image
+                    ? <div className="photo-block"><img src={item.image} alt={item.name} loading="lazy" /></div>
+                    : <div className="photo-block" dangerouslySetInnerHTML={{ __html: ICON }} />}
                   <div className="body">
                     <small>{t(item.category_name)}</small>
                     <h3>{t(item.name)}</h3>
@@ -576,6 +579,7 @@ function AdminPage() {
   const [catalogSuccess, setCatalogSuccess] = useState('')
   const [editingPartId, setEditingPartId] = useState<number | null>(null)
   const [partForm, setPartForm] = useState({ name: '', description: '', category: '', brand: '', equipment_model: '' })
+  const [partImage, setPartImage] = useState<File | null>(null)
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     typeof Notification !== 'undefined' && Notification.permission === 'granted',
   )
@@ -775,12 +779,14 @@ function AdminPage() {
   const resetPartForm = () => {
     setEditingPartId(null)
     setPartForm({ name: '', description: '', category: '', brand: '', equipment_model: '' })
+    setPartImage(null)
     setCatalogError('')
     setCatalogSuccess('')
   }
 
   const editPart = (part: CatalogItem) => {
     setEditingPartId(part.id)
+    setPartImage(null)
     setPartForm({
       name: part.name,
       description: part.description,
@@ -796,25 +802,33 @@ function AdminPage() {
     event.preventDefault()
     setCatalogError('')
     setCatalogSuccess('')
-    const payload = {
-      ...partForm,
-      category: Number(partForm.category),
-      is_active: true,
-    }
+    const payload = { ...partForm, category: Number(partForm.category), is_active: true }
     const url = editingPartId
       ? `${API_BASE_URL}/api/catalog/manage/${editingPartId}/`
       : `${API_BASE_URL}/api/catalog/manage/`
 
     try {
+      const headers = buildHeaders(true)
+      let body: BodyInit
+      if (partImage) {
+        const formData = new FormData()
+        Object.entries(payload).forEach(([key, value]) => formData.append(key, String(value)))
+        formData.append('image', partImage)
+        delete headers['Content-Type']
+        body = formData
+      } else {
+        body = JSON.stringify(payload)
+      }
+
       const response = await fetch(url, {
         method: editingPartId ? 'PATCH' : 'POST',
         credentials: 'include',
-        headers: buildHeaders(true),
-        body: JSON.stringify(payload),
+        headers,
+        body,
       })
       if (!response.ok) {
         const details = await response.json() as Record<string, string[]>
-        throw new Error(Object.values(details).flat().join(' ') || `Catalog save failed (${response.status})`)
+        throw new Error(Object.values(details).flat().map(t).join(' ') || `Catalog save failed (${response.status})`)
       }
       if (!await loadCatalog()) return
       setCatalogSuccess(t(editingPartId ? 'Карточка обновлена.' : 'Позиция добавлена в каталог.'))
@@ -1035,6 +1049,15 @@ function AdminPage() {
                 {t('Описание')}
                 <textarea rows={3} value={partForm.description} onChange={(event) => setPartForm({ ...partForm, description: event.target.value })} />
               </label>
+              <label className="catalog-description">
+                {t('Изображение товара (до 5 МБ)')}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) => setPartImage(event.target.files?.[0] ?? null)}
+                />
+                <span className="muted">{partImage?.name ?? t('Файл необязателен. Поддерживаются изображения PNG, JPEG и WebP.')}</span>
+              </label>
               <div className="catalog-editor-actions">
                 <button className="btn" type="submit">{t(editingPartId ? 'Сохранить изменения' : 'Добавить в каталог')}</button>
                 {editingPartId !== null && <button className="link-button" type="button" onClick={resetPartForm}>{t('Отмена')}</button>}
@@ -1049,6 +1072,7 @@ function AdminPage() {
                 {parts.map((part) => (
                   <article className={`admin-part ${part.is_active ? '' : 'admin-part-archived'}`} key={part.id}>
                     <div>
+                      {part.image && <img className="admin-part-image" src={part.image} alt="" loading="lazy" />}
                       <strong>{t(part.name)}</strong>
                       <span>{t(part.category_name)}{part.brand ? ` · ${part.brand}` : ''}{part.equipment_model ? ` · ${part.equipment_model}` : ''}</span>
                       <p>{t(part.description)}</p>

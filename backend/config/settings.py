@@ -84,6 +84,50 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+object_storage_settings = {
+    'bucket_name': env('R2_BUCKET_NAME', default=''),
+    'endpoint_url': env('R2_ENDPOINT_URL', default=''),
+    'access_key': env('R2_ACCESS_KEY_ID', default=''),
+    'secret_key': env('R2_SECRET_ACCESS_KEY', default=''),
+    'custom_domain': env('R2_CUSTOM_DOMAIN', default=''),
+}
+configured_object_storage = any(object_storage_settings.values())
+R2_STORAGE_ENABLED = configured_object_storage
+
+if configured_object_storage and not all(object_storage_settings.values()):
+    raise ImproperlyConfigured(
+        'Configure all R2 storage settings or leave all of them empty.'
+    )
+
+if configured_object_storage:
+    if '://' in object_storage_settings['custom_domain']:
+        raise ImproperlyConfigured(
+            'R2_CUSTOM_DOMAIN must be a hostname without a URL scheme.'
+        )
+    STORAGES = {
+        'default': {
+            'BACKEND': 'storages.backends.s3.S3Storage',
+            'OPTIONS': {
+                **object_storage_settings,
+                'region_name': 'auto',
+                'addressing_style': 'path',
+                'signature_version': 's3v4',
+                'querystring_auth': False,
+                'file_overwrite': False,
+                'default_acl': None,
+                'location': 'media',
+                'object_parameters': {
+                    'CacheControl': 'public, max-age=31536000, immutable',
+                },
+            },
+        },
+        'staticfiles': {
+            'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+        },
+    }
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = not DEBUG

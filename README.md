@@ -8,6 +8,7 @@ This project includes:
 - catalog search by part name, category, brand, and equipment model
 - validated spare-parts request form
 - a separate manager site for request tracking, status changes, and catalog editing
+- optional catalog image uploads with local development storage and S3-compatible production storage
 - Russian, Kazakh, and English storefront and manager interfaces
 - opt-in in-browser manager notifications for new requests
 - storefront search metadata, social sharing cards, structured organization data, and a sitemap
@@ -82,6 +83,19 @@ This starts:
 The demo database on Render's free plan expires after 30 days, and the free backend can spin down while idle. This setup is intended for demonstration, not durable production data.
 
 The published company phone, email, and social links are listed in the storefront. The catalog starts with sample heavy-equipment categories and can be maintained in the manager panel or Django admin. Manager notifications poll for new requests every 30 seconds and work only while the manager panel is open; browser notifications are optional and require browser permission. No paid notification service is used.
+
+### Optional catalog image storage
+Catalog images are limited to 5 MB and validated as image files. Local development stores them in `backend/media/`. Production uploads are deliberately disabled until durable object storage is configured, because Render's local filesystem is ephemeral.
+
+To enable public catalog images with Cloudflare R2 (or another S3-compatible provider), create a bucket, configure a public custom domain for serving its objects, and set all of these backend environment variables:
+
+- `R2_BUCKET_NAME`
+- `R2_ENDPOINT_URL` (for R2, `https://<account-id>.r2.cloudflarestorage.com`)
+- `R2_ACCESS_KEY_ID`
+- `R2_SECRET_ACCESS_KEY`
+- `R2_CUSTOM_DOMAIN` (hostname only, without `https://`)
+
+Keep the access key and secret private. Leave all five values empty to keep local filesystem storage; the application rejects partial configurations. Check the provider's current free-tier limits and billing terms before enabling uploads. The storefront logo remains a static frontend asset and does not depend on object storage.
 
 ## Current status
 The storefront and manager flow are implemented and validated. The project is now positioned as an MVP-ready prototype with deployment and environment configuration in place.

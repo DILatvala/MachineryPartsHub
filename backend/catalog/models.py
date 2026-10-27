@@ -18,6 +18,7 @@ class Part(models.Model):
     description = models.TextField(blank=True, default='')
     brand = models.CharField(max_length=120, blank=True, default='')
     equipment_model = models.CharField(max_length=160, blank=True, default='')
+    image = models.ImageField(upload_to='catalog/', blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
