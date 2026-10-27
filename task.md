@@ -45,10 +45,15 @@
 
 ## Sprint 6: Hardening
 - [ ] Add media storage with Cloudflare R2/S3
-- [ ] Add notification layer (Telegram or email)
-- [ ] Improve SEO and metadata
+- [x] Add no-cost in-browser manager notifications for new requests
+- [x] Improve SEO and metadata, social cards, structured data, robots, and sitemap
 - [ ] Add analytics and contact form tracking if needed
 - [x] Final security review and cleanup
+
+## Sprint 7: Catalog and usability improvements
+- [x] Search catalog items by brand and equipment model
+- [x] Add catalog editing and soft-archive controls to the manager panel
+- [x] Add Russian, Kazakh, and English language switching
 
 ## Definition of done
 - [x] Public catalog works end-to-end
@@ -58,4 +63,4 @@
 - [x] Core functional tests pass
 
 ## Next up
-- Improve hardening, SEO metadata, and media storage
+- Consider media storage and optional analytics if those capabilities are needed
